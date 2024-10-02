@@ -12,8 +12,6 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 def preprocess_image_for_ocr(img_path: str) -> cv2.typing.MatLike:
     img = cv2.imread(img_path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite('test3.png', gray)
-
     return gray
 
 def preprocess_expression(text: str) -> str:
@@ -80,7 +78,6 @@ def take_screenshot(save_path: str):
 (w_mult, l_mult) = (screen_w / 1920, screen_l / 1080) # Relative to my screen's width and length
 
 image_path = "test.png"
-# Define the region (left, top, right, bottom) - adjust this depending on where the expression is in the image
 region = (750 * w_mult, 520 * l_mult, 1150 * w_mult, 600 * l_mult)
 
 time.sleep(5)
