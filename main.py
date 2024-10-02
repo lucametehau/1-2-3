@@ -6,20 +6,10 @@ import time
 import cv2
 import numpy as np
 
-# here set your own Tesseract PATH pls, if not in PATH
+# Here set your own Tesseract PATH pls, if not in PATH
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 def preprocess_image_for_ocr(img_path: str) -> cv2.typing.MatLike:
-    """
-    Preprocesses the image for better OCR results.
-
-    Args:
-    - img_path: str, the path of the input image.
-
-    Returns:
-    - preprocessed_image: the preprocessed image ready for OCR.
-    """
-
     img = cv2.imread(img_path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imwrite('test3.png', gray)
@@ -27,16 +17,7 @@ def preprocess_image_for_ocr(img_path: str) -> cv2.typing.MatLike:
     return gray
 
 def preprocess_expression(text: str) -> str:
-    """
-    Preprocesses an expresion, accounting for the mistakes of OCR
-
-    Args:
-    - text: str, the expression as a string
-
-    Returns:
-    - processed_text: str, the processed expression
-    """
-    # cursed processing, still not fully fixed
+    # Cursed processing, still not fully fixed
     good_text = ''
     for (i, ch) in enumerate(text):
         if ch == '5':
@@ -56,26 +37,14 @@ def preprocess_expression(text: str) -> str:
 
     return text
 
-# print(preprocess_expression('1-1-145+3-3=?'))
-# print(preprocess_expression('14+14+2-354+3-1=?'))
-
-# exit(0)
 
 def solve_expression_in_region(image_path: str, region: tuple[int, int, int, int]) -> str | int | None:
-    """
-    Solves a simple arithmetic expression within a specific region of the image.
-
-    Args:
-    - image_path: str, path to the image file.
-    - region: tuple, a tuple specifying (left, top, right, bottom) coordinates of the region to crop.
-
-    Returns:
-    - result: The evaluated result of the arithmetic expression found in the region.
-    """
     # Open the image
     img = Image.open(image_path)
 
     cropped_img = img.crop(region)
+
+    # Save image in a dummy path for potential bug fixing
     cropped_img.save('test2.png')
     cropped_img = Image.fromarray(preprocess_image_for_ocr('test2.png'))
 
@@ -91,7 +60,6 @@ def solve_expression_in_region(image_path: str, region: tuple[int, int, int, int
 
     if not expression:
         return "No arithmetic expression found."
-
     try:
         result = eval(expression[0])
     except Exception as e:
@@ -100,31 +68,20 @@ def solve_expression_in_region(image_path: str, region: tuple[int, int, int, int
     return result
 
 def click_at_position(x: int, y: int):
-    """
-    Moves the mouse to (x, y) coordinates and performs a click.
-    
-    Args:
-    - x: int, the x-coordinate on the screen.
-    - y: int, the y-coordinate on the screen.
-    """
     pyautogui.moveTo(x, y, duration=0)
     pyautogui.click()
 
 
 def take_screenshot(save_path: str):
-    """
-    Takes a screenshot of the screen and saves it to the specified file path.
-    
-    Args:
-    - save_path: str, the path where the screenshot will be saved (including file name and extension).
-    """
-    time.sleep(1)
     screenshot = pyautogui.screenshot()
     screenshot.save(save_path)
 
+(screen_w, screen_l) = pyautogui.size()
+(w_mult, l_mult) = (screen_w / 1920, screen_l / 1080) # Relative to my screen's width and length
+
 image_path = "test.png"
 # Define the region (left, top, right, bottom) - adjust this depending on where the expression is in the image
-region = (750, 520, 1150, 600)
+region = (750 * w_mult, 520 * l_mult, 1150 * w_mult, 600 * l_mult)
 
 time.sleep(5)
 
@@ -135,10 +92,10 @@ for i in range(1000):
 
     if result < 1 or 3 < result: assert False
 
-    if result == 1: click_at_position(900, 640)
-    elif result == 2: click_at_position(900, 700)
-    else: click_at_position(900, 750)
+    if result == 1: click_at_position(900 * w_mult, 640 * l_mult)
+    elif result == 2: click_at_position(900 * w_mult, 700 * l_mult)
+    else: click_at_position(900 * w_mult, 750 * l_mult)
 
-    time.sleep(0.6)
+    time.sleep(1.1)
 
 print(f"Result of the expression: {result}")
